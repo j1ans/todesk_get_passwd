@@ -10,8 +10,17 @@ char MAGIC_VALUE[] = "WinSock 2.0";
 PVOID BumpSearchProcessMemory(HANDLE hProcess);
 void find_strings_in_memory(const uint8_t* address, size_t size, size_t min_len);
 
-int main()
+int main(int argc,char*argv[])
 {
+    /*
+    for(int i =0;i<argc;i++){
+        if (strstr(argv[i]),"-h") {
+            std::wcout << "[+]usage:"<<std::endl;
+            return 0;
+        }
+    }
+    */
+   
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     LPPROCESSENTRY32 lpPE = 0;
     lpPE = (LPPROCESSENTRY32)VirtualAlloc(NULL, sizeof(PROCESSENTRY32), MEM_COMMIT, PAGE_READWRITE);
@@ -118,19 +127,16 @@ void find_strings_in_memory(const uint8_t* address, size_t size, size_t min_len)
                 size_t dict_size = sizeof(dict) / sizeof(dict[0]);  // 计算数组元素个数
 
                 for (size_t i = 0; i < dict_size; i++) {
-                    if (find_string_count - 1 == dict[i].key) {
-                        printf("[+]Found %s => \"",
-                            dict[i].value);
-                        // 安全打印字符串(确保不越界)
-                        size_t end = string_start + string_length;
-                        if (end > size) end = size;
+                    printf("[+]Found String => \"");
+                    // 安全打印字符串(确保不越界)
+                    size_t end = string_start + string_length;
+                    if (end > size) end = size;
 
-                        for (size_t i = string_start; i < end; i++) {
-                            putchar(address[i]);
-                        }
-                        printf("\"\n");
-                        break;
+                    for (size_t i = string_start; i < end; i++) {
+                        putchar(address[i]);
                     }
+                    printf("\"\n");
+                    break;
                 }
             }
             in_string = 0;
